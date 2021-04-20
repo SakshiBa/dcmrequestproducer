@@ -19,7 +19,7 @@ import com.somos.dcm.request.payload.Mnls;
 
 @Component
 public class RequestConstructor {
-	
+
 	Logger logger = LoggerFactory.getLogger(RequestConstructor.class);
 
 	static Map<String, String> transformMap = new HashMap<String, String>();
@@ -51,37 +51,34 @@ public class RequestConstructor {
 	 * @throws ScpRequestException
 	 */
 	public void headerMessage(CRRequest croJsonObject) throws ScpRequestException {
-		
+
 		String requestMsg = croJsonObject.getMsgType();
 		String messageIdVal = croJsonObject.getMsgId();
 
-		checkForMessageId(messageIdVal); 
+		checkForMessageId(messageIdVal);
 
 		String patt;
 		String messageId2;
-		if (RTRV_ISA.equals(requestMsg)) {  
+		if (RTRV_ISA.equals(requestMsg)) {
 			patt = "^S[A-Za-z0-9]{9}$";
 			messageId2 = "NODE";
 		} else {
 			patt = "^M[A-Za-z0-9]{9}$";
 			messageId2 = "CMSD";
 		}
-		logger.debug("message type: " +messageId2);
+		logger.debug("message type: " + messageId2);
 
 		String priority = croJsonObject.getPriority();
 		if (null == priority) {
 			priority = "NOR";
 		}
-		patternCheck(messageIdVal, patt, "msgId"); //SB:VALIDATION CHECK
+		patternCheck(messageIdVal, patt, "msgId");
 
-		getClliCode(requestMsg, croJsonObject);////SB:VALIDATION CHECK
+		getClliCode(requestMsg, croJsonObject);
 
-			String messId; ////SB:VALIDATION CHECK,transformMap REQD
-			if (transformMap.containsKey(requestMsg)) {
-				messId = transformMap.get(requestMsg);
-			} else {
-				throw new ScpRequestException("msgType provided " + requestMsg + " is not supported");
-			}
+		if(!transformMap.containsKey(requestMsg)) {
+			throw new ScpRequestException("msgType provided " + requestMsg + " is not supported");
+		}
 	}
 
 	protected void patternCheck(String value, String patt, String param) throws ScpRequestException {
